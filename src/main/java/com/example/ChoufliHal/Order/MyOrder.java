@@ -8,15 +8,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.time.LocalDateTime;
 
-@Data
-@Entity
-public class Order {
-    @Id @GeneratedValue(strategy= GenerationType.IDENTITY)
 
+@Entity
+@Data
+public class MyOrder {
+    @Id @GeneratedValue(strategy= GenerationType.IDENTITY)
      private Long orderId;
-     private LocalDateTime date;
+     private LocalDateTime orderDate;
      private Boolean delivery;
-     private Long OrderId;
      private float totalPrice;
      private Payment paymentMethod;
 
