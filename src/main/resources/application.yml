@@ -1,6 +1,7 @@
+
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/db_choufli_hal
+    url: jdbc:mysql://localhost:3306/choufli_hal
     username: root
     password:
 
