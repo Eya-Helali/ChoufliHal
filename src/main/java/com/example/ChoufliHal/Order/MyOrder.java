@@ -1,14 +1,14 @@
 package com.example.ChoufliHal.Order;
 
+import com.example.ChoufliHal.Product.Product;
+import com.example.ChoufliHal.User.User;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Entity
@@ -25,6 +25,11 @@ import java.time.LocalDateTime;
      private LocalDateTime updateDate;
      private LocalDateTime deleteDate;
 
+     @ManyToOne
+     private User user;
+
+     @OneToMany(mappedBy = "order")
+     private List<Product> product;
 
 
 

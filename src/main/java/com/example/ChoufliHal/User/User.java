@@ -1,5 +1,6 @@
 package com.example.ChoufliHal.User;
 
+import com.example.ChoufliHal.Order.MyOrder;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -7,11 +8,9 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Entity
@@ -38,5 +37,7 @@ public class User  {
     private LocalDateTime updateDate;
     private LocalDateTime deleteDate;
 
+    @OneToMany
+    private List<MyOrder> myOrder;
 
 }
