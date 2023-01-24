@@ -37,7 +37,7 @@ public class User  {
     private LocalDateTime updateDate;
     private LocalDateTime deleteDate;
 
-    @OneToMany
+    @OneToMany(mappedBy="user")
     private List<MyOrder> myOrder;
 
 }

@@ -28,7 +28,7 @@ import java.util.List;
      @ManyToOne
      private User user;
 
-     @OneToMany(mappedBy = "order")
+     @OneToMany(mappedBy = "myOrder")
      private List<Product> product;
 
 

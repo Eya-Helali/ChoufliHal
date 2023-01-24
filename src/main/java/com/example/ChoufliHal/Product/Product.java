@@ -26,6 +26,6 @@ public class Product  {
     private LocalDateTime deleteDate;
 
     @ManyToOne
-    private MyOrder myorder;
+    private MyOrder myOrder;
 
 }
