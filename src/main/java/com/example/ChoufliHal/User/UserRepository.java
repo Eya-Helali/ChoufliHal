@@ -11,7 +11,7 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUsername(String username);
-
+    Optional<User> findByVerificationCode(String code);
 
     @Transactional
     @Modifying
@@ -23,4 +23,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Modifying
     @Query("UPDATE User u SET u.userRole=?1 WHERE u.userId=?2")
     void changeUserRole(UserRole userRole, Long userId);
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE User u SET u.enabled=true , u.locked=false WHERE u.userId=?1")
+    void enable(Long userId);
 }

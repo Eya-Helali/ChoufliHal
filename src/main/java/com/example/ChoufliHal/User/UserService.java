@@ -1,20 +1,39 @@
 package com.example.ChoufliHal.User;
 
-//import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import com.example.ChoufliHal.User.LoginAndRegistration.Registration;
+import net.bytebuddy.utility.RandomString;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
-
-        private final UserRepository userRepository;
+public class UserService  implements UserDetailsService {
 
 
+    private final UserRepository userRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final JavaMailSender javaMailSender;
 
-        public List<User> getAllUsers()
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException
+    { return userRepository.findByUsername(username).orElseThrow(()  -> new UsernameNotFoundException("USER NOT FOUND"));}
+
+
+    public List<User> getAllUsers()
         { return userRepository.findAll();}
 
       public Optional<User> getUserByUsername(String username)
@@ -42,10 +61,52 @@ public class UserService {
             if (user.isPresent())
             {   userRepository.changeUserRole(userRole,user.get().getUserId());
                 return user;}
-    //       else throw new UserameNotFoundException("User not found");
-            return user;
+          else throw new UsernameNotFoundException("User not found");
+
         }
 
+    public void register(Registration user, String siteURL) throws MessagingException, UnsupportedEncodingException
+    { String randomCode= RandomString.make(64);
+        User newUser = new User(
+                user.getFirstName(),
+                user.getLastName(),
+                user.getUsername(),
+                user.getPhoneNumber(),
+                user.getCin(),
+                user.getAddress(),
+                bCryptPasswordEncoder.encode(user.getPassword()),randomCode);
+        addUser(newUser);
+        sendVerificationEmail(user,siteURL);
+    }
+
+
+    public void sendVerificationEmail(Registration user, String siteURL  ) throws MessagingException, UnsupportedEncodingException {
+        String subject ="Please verify your registration";
+        String senderName="Choufli hal team ";
+        String mailContent= "<p>Dear "+ user.getFirstName()+" "+user.getLastName()+ "</p>";
+        mailContent+= "<p> Please click the link below to verify your registration : </p> ";
+        String verifyURL= siteURL +"/verify?code="+userRepository.findByUsername(user.getUsername()).get().getVerificationCode();
+        mailContent+="<h3> <a href=\""+verifyURL+"\">VERIFY</a></h3>";
+        mailContent+="<p> Thank you <br> Choufli hal team</p>";
+
+        MimeMessage message=javaMailSender.createMimeMessage();
+        MimeMessageHelper helper =new MimeMessageHelper(message);
+        helper.setFrom("chouflihalapp@gmail.com",senderName);
+        helper.setTo(user.getUsername());
+        helper.setSubject(subject);
+        helper.setText(mailContent,true);
+        javaMailSender.send(message);
+    }
+
+
+    public Boolean verify(String verificationCode)
+    { Optional<User> user= userRepository.findByVerificationCode(verificationCode);
+        if (!(user.isPresent()) || user.get().isEnabled() )
+            return false;
+        else {  userRepository.enable(user.get().getUserId());
+            user.get().setLocked(false);
+            return true;}
+    }
 
 
 
